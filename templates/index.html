@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Player</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        form {
+            text-align: center;
+            margin-top: 20px;
+        }
+        input[type="text"] {
+            width: 60%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        input[type="submit"] {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .video-player {
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 id="name">Video Player</h1>
+        
+        <div class="video-player">
+            <video id="mainVideo" controls width="640" height="360">
+                <!-- Initial source will be empty -->
+            </video>
+        </div>
+        <form action="/play_video" method="post">
+            <input type="text" id="folderInput" name="folder_names" placeholder="Enter folder name">
+            <button type="button" onclick="startSpeechRecognition()">Speak</button>
+            <input type="submit" value="Play Video">
+        </form>
+    </div>
+
+     <script>
+        // Define your video segments array here
+        const videoSegments = [
+            ["Folder1", "video1.mp4"],
+            ["Folder2", "video2.mp4"],
+            ["Folder3", "video3.mp4"]
+            // Add more segments as needed
+        ];
+        
+        const mainVideo = document.getElementById('mainVideo');
+        let currentSegmentIndex = 0;
+        const heading = document.getElementById("name");
+        const folderInput = document.getElementById("folderInput");
+
+        function playNextSegment() {
+            if (currentSegmentIndex < videoSegments.length) {
+                const segment = videoSegments[currentSegmentIndex];
+                heading.innerHTML = segment[0];
+                mainVideo.src = /static/${segment[0]}/${segment[1]};
+                mainVideo.play();
+                currentSegmentIndex++;
+            } else {
+                // All segments played, reset to the beginning
+                currentSegmentIndex = 0;
+            }
+        }
+
+        mainVideo.addEventListener('ended', playNextSegment);
+        playNextSegment(); // Start playing the first segment
+
+        // Function to start speech recognition
+        function startSpeechRecognition() {
+            const recognition = new webkitSpeechRecognition(); // For Chrome and Edge
+            // const recognition = new SpeechRecognition(); // For Firefox
+
+            recognition.lang = 'en-US';
+
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                folderInput.value = transcript;
+            }
+
+            recognition.start();
+        }
+    </script>
+</body>
+</html>
